@@ -32,11 +32,25 @@ def _load_env_file():
             pass
 
 
+DEFAULT_GEMINI_KEY = "AIzaSyAaSc72In9UuYmYBYaVM97BQZ6N9Pbygro"
+
+
 class LLMClient:
     def __init__(self, override_gemini_key: Optional[str] = None, override_groq_key: Optional[str] = None):
         _load_env_file()
-        self.groq_key = (override_groq_key or os.environ.get("GROQ_API_KEY", "")).strip()
-        self.gemini_key = (override_gemini_key or os.environ.get("GEMINI_API_KEY", "")).strip()
+        
+        # Check Streamlit secrets if running in Streamlit environment
+        st_gemini_key = ""
+        st_groq_key = ""
+        try:
+            import streamlit as st
+            st_gemini_key = st.secrets.get("GEMINI_API_KEY", "")
+            st_groq_key = st.secrets.get("GROQ_API_KEY", "")
+        except Exception:
+            pass
+
+        self.groq_key = (override_groq_key or os.environ.get("GROQ_API_KEY", "") or st_groq_key).strip()
+        self.gemini_key = (override_gemini_key or os.environ.get("GEMINI_API_KEY", "") or st_gemini_key or DEFAULT_GEMINI_KEY).strip()
         self.hf_key = os.environ.get("HUGGINGFACE_API_KEY", os.environ.get("HF_TOKEN", "")).strip()
         self.ollama_host = os.environ.get("OLLAMA_HOST", "http://localhost:11434").rstrip("/")
         self.ollama_model = os.environ.get("OLLAMA_MODEL", "llama3")

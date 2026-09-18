@@ -3,11 +3,17 @@
 > **Technical Assessment — AI Engineer Role | DOTMappers IT Pvt. Ltd.**  
 > An end-to-end, zero-cost AI system that ingests customer support ticket data, enables Natural Language querying (Text-to-SQL + LLM synthesis), detects multi-layered anomalies, and provides both a FastAPI REST API and modern interactive UI dashboards.
 
+[![Live Streamlit App](https://img.shields.io/badge/Streamlit%20Cloud-Live%20Demo-FF4B4B.svg?style=for-the-badge&logo=streamlit)](https://assessmentticket.streamlit.app/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717.svg?style=for-the-badge&logo=github)](https://github.com/Sehaj64/Assessment)
+
 [![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688.svg)](https://fastapi.tiangolo.com/)
 [![Zero--Cost](https://img.shields.io/badge/Architecture-100%25%20Zero--Cost-brightgreen.svg)]()
 [![Tests](https://img.shields.io/badge/Tests-16%20Passed%20(100%25)-success.svg)]()
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
+
+> 🚀 **Live Interactive Web App**: **[https://assessmentticket.streamlit.app/](https://assessmentticket.streamlit.app/)**  
+> *Test live natural language queries, multi-factor anomaly radar, and ticket exploration directly in your browser — zero installation required.*
 
 ---
 
@@ -148,8 +154,8 @@ The system identifies anomalies through 4 complementary layers:
 
 1. **Clone the repository**:
    ```bash
-   git clone <repo-url>
-   cd ai-intern-assessment
+   git clone https://github.com/Sehaj64/Assessment.git
+   cd Assessment
    ```
 
 2. **Create and activate a virtual environment**:
@@ -189,7 +195,8 @@ The system identifies anomalies through 4 complementary layers:
    ```
    - **Interactive Web Dashboard**: [http://localhost:8000/](http://localhost:8000/)
    - **Swagger API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
-   - **Alternative Streamlit Dashboard**:
+   - **Live Streamlit Cloud Demo**: [https://assessmentticket.streamlit.app/](https://assessmentticket.streamlit.app/)
+   - **Alternative Local Streamlit**:
      ```bash
      streamlit run app_streamlit.py
      ```

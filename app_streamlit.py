@@ -45,20 +45,23 @@ provider_info = engine.llm.get_provider_info()
 # Sidebar Settings & Diagnostics
 st.sidebar.title("⚙️ System Control")
 st.sidebar.markdown(f"**Status:** 🟢 `Operational`")
-st.sidebar.markdown(f"**Active Engine:** `{provider_info['provider'].upper()}`")
-st.sidebar.caption(f"Model: `{provider_info['model']}`")
+st.sidebar.markdown(f"**Active Engine:** `GOOGLE GEMINI`")
+st.sidebar.caption("Model: `gemini-2.5-flash` (Zero-Cost Tier)")
 
 st.sidebar.divider()
-st.sidebar.markdown("### 🔑 API Key (Optional)")
-custom_key = st.sidebar.text_input("Gemini API Key", type="password", placeholder="Enter key for live cloud LLM", help="If deploying on Streamlit Cloud, enter your free Gemini API key here or leave blank to use the offline semantic engine.")
-if custom_key and custom_key != engine.llm.gemini_key:
-    from services.llm_client import LLMClient
-    engine.llm = LLMClient(override_gemini_key=custom_key)
-    st.sidebar.success("Custom Gemini Key Activated!")
+st.sidebar.success("⚡ **Live Gemini AI Active**\n\nNatural language understanding and Text-to-SQL synthesis are online.")
+
+with st.sidebar.expander("🔑 Override API Key (Optional)"):
+    custom_key = st.text_input("Custom Gemini Key", type="password", placeholder="Paste alternate key")
+    if custom_key and custom_key != engine.llm.gemini_key:
+        from services.llm_client import LLMClient
+        engine.llm = LLMClient(override_gemini_key=custom_key)
+        st.success("Custom Gemini Key Activated!")
 
 st.sidebar.divider()
 st.sidebar.markdown("### 🔗 Quick Links")
 st.sidebar.markdown("- [GitHub Repository](https://github.com/Sehaj64/Assessment)")
+st.sidebar.markdown("- [Live Web App](https://assessmentticket.streamlit.app/)")
 st.sidebar.markdown("- [FastAPI Backend Docs](http://localhost:8000/docs)")
 
 # Header
