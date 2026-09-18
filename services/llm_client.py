@@ -14,10 +14,29 @@ from typing import Any, Dict, Optional, Tuple
 import httpx
 
 
+def _load_env_file():
+    """Loads key-value pairs from .env if present without requiring third-party dotenv."""
+    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
+    if os.path.exists(env_path):
+        try:
+            with open(env_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        k, v = line.split("=", 1)
+                        k = k.strip()
+                        v = v.strip().strip("'\"")
+                        if k and not os.environ.get(k):
+                            os.environ[k] = v
+        except Exception:
+            pass
+
+
 class LLMClient:
-    def __init__(self):
-        self.groq_key = os.environ.get("GROQ_API_KEY", "").strip()
-        self.gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    def __init__(self, override_gemini_key: Optional[str] = None, override_groq_key: Optional[str] = None):
+        _load_env_file()
+        self.groq_key = (override_groq_key or os.environ.get("GROQ_API_KEY", "")).strip()
+        self.gemini_key = (override_gemini_key or os.environ.get("GEMINI_API_KEY", "")).strip()
         self.hf_key = os.environ.get("HUGGINGFACE_API_KEY", os.environ.get("HF_TOKEN", "")).strip()
         self.ollama_host = os.environ.get("OLLAMA_HOST", "http://localhost:11434").rstrip("/")
         self.ollama_model = os.environ.get("OLLAMA_MODEL", "llama3")

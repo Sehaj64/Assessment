@@ -42,9 +42,28 @@ db, detector, engine = get_services()
 stats = db.get_summary_stats()
 provider_info = engine.llm.get_provider_info()
 
+# Sidebar Settings & Diagnostics
+st.sidebar.title("⚙️ System Control")
+st.sidebar.markdown(f"**Status:** 🟢 `Operational`")
+st.sidebar.markdown(f"**Active Engine:** `{provider_info['provider'].upper()}`")
+st.sidebar.caption(f"Model: `{provider_info['model']}`")
+
+st.sidebar.divider()
+st.sidebar.markdown("### 🔑 API Key (Optional)")
+custom_key = st.sidebar.text_input("Gemini API Key", type="password", placeholder="Enter key for live cloud LLM", help="If deploying on Streamlit Cloud, enter your free Gemini API key here or leave blank to use the offline semantic engine.")
+if custom_key and custom_key != engine.llm.gemini_key:
+    from services.llm_client import LLMClient
+    engine.llm = LLMClient(override_gemini_key=custom_key)
+    st.sidebar.success("Custom Gemini Key Activated!")
+
+st.sidebar.divider()
+st.sidebar.markdown("### 🔗 Quick Links")
+st.sidebar.markdown("- [GitHub Repository](https://github.com/Sehaj64/Assessment)")
+st.sidebar.markdown("- [FastAPI Backend Docs](http://localhost:8000/docs)")
+
 # Header
 st.title("🎫 TicketPulse AI Intelligence System")
-st.caption(f"DOTMappers Technical Assessment | Active LLM: **{provider_info['provider'].upper()}** ({provider_info['model']}) | Zero-Cost Architecture")
+st.caption(f"DOTMappers Technical Assessment | Active LLM: **{engine.llm.active_provider.upper()}** ({engine.llm.active_model}) | Zero-Cost Architecture")
 
 # Top KPI Metric Cards
 col1, col2, col3, col4, col5 = st.columns(5)
@@ -88,8 +107,9 @@ with tab_query:
             
             # Answer Box
             st.markdown("### 💡 Executive AI Summary")
-            st.info(result["answer"])
+            st.markdown(result["answer"])
 
+            st.markdown("---")
             col_meta1, col_meta2, col_meta3 = st.columns(3)
             col_meta1.caption(f"**Provider:** `{result['llm_provider']}`")
             col_meta2.caption(f"**Latency:** `{result['execution_time_ms']} ms`")

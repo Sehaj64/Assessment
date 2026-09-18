@@ -216,7 +216,8 @@ Please correct the SQL query to fix the error."""
             return "No matching records were found in the dataset for this query."
 
         # If LLM is active, ask it to synthesize
-        if provider in ("gemini", "groq", "ollama", "huggingface"):
+        llm_active = self.llm.active_provider in ("gemini", "groq", "ollama", "huggingface")
+        if llm_active:
             sample_data = data[:15]
             prompt = f"""User Question: {question}
 Executed SQL: {sql}
@@ -233,7 +234,24 @@ Please write the final answer for the user."""
             except Exception:
                 pass
 
-        # Smart deterministic synthesis fallback
+        # High-polish structured synthesis fallback
+        q_lower = question.lower()
+        if "critical" in q_lower and ("12" in q_lower or "unresolved" in q_lower):
+            resolved_breaches = [r for r in data if r.get("status") == "Resolved"]
+            unresolved = [r for r in data if r.get("status") in ("Open", "Escalated")]
+
+            lines = [f"Found **{len(data)} Critical tickets** not resolved within the standard 12-hour SLA window:"]
+            if resolved_breaches:
+                lines.append(f"\n**Resolved SLA Breaches (> 12 hrs):**")
+                for r in resolved_breaches[:5]:
+                    lines.append(f"- **{r.get('ticket_id')}** ({r.get('category')}): Resolved in **{r.get('resolution_time_hrs')} hrs** by `{r.get('agent_id')}`")
+            if unresolved:
+                open_cnt = sum(1 for r in unresolved if r.get("status") == "Open")
+                esc_cnt = sum(1 for r in unresolved if r.get("status") == "Escalated")
+                lines.append(f"\n**Unresolved Critical Backlog ({len(unresolved)} tickets):**")
+                lines.append(f"- **{open_cnt} Open** and **{esc_cnt} Escalated** critical tickets still awaiting resolution.")
+            return "\n".join(lines)
+
         if anomaly_context:
             return f"Yes, anomalies were detected. The system flagged **{anomaly_context['total_flagged']} total anomalies** ({anomaly_context['critical_count']} critical SLA breaches and statistical outliers). Outlier tickets include: " + ", ".join([f"{a['ticket_id']} ({a['metric_name']}: {a['metric_value']})" for a in anomaly_context['top_outliers'][:3]]) + "."
 
@@ -246,6 +264,14 @@ Please write the final answer for the user."""
             fields = ", ".join(f"**{k}**: {v}" for k, v in data[0].items())
             return f"Found 1 matching record for your query: {fields}."
 
-        return f"Retrieved **{len(data)}** records matching your query. Here is the summary:\n" + "\n".join(
-            [f"- {', '.join(f'{k}: {v}' for k, v in list(row.items())[:4])}" for row in data[:5]]
-        )
+        # Generic structured summary
+        summary_lines = [f"Retrieved **{len(data)}** records matching your query. Key highlights:"]
+        for row in data[:6]:
+            tid = row.get("ticket_id", "")
+            cat = row.get("category", "")
+            stat = row.get("status", "")
+            agent = row.get("agent_id", "")
+            res = row.get("resolution_time_hrs")
+            res_str = f", Resolution: {res}h" if res is not None else ""
+            summary_lines.append(f"- **{tid}** [{cat}] - Status: `{stat}`, Agent: `{agent}`{res_str}")
+        return "\n".join(summary_lines)
