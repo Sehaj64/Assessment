@@ -103,7 +103,7 @@ with tab_query:
             if result["data"]:
                 st.markdown("### 📊 Retrieved Data")
                 df_res = pd.DataFrame(result["data"])
-                st.dataframe(df_res, use_container_width=True)
+                st.dataframe(df_res)
         else:
             st.warning("Please enter a question.")
 
@@ -151,4 +151,4 @@ with tab_tickets:
         filtered_df = filtered_df[filtered_df["status"].isin(stat_select)]
 
     st.write(f"Showing {len(filtered_df)} of {len(raw_df)} tickets:")
-    st.dataframe(filtered_df, use_container_width=True)
+    st.dataframe(filtered_df)
