@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TicketPulse AI | Enterprise Support Analytics & Anomaly Detection</title>
+  <meta name="description" content="AI-Powered Customer Support Ticket Analytics, Text-to-SQL Querying, and Multi-Factor Anomaly Detection.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Navigation Header -->
+    <header class="navbar">
+      <div class="nav-brand">
+        <div class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div>
+          <h1>TicketPulse <span class="gradient-text">AI</span></h1>
+          <p class="brand-tagline">DOTMappers Support Intelligence Engine</p>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <div id="system-badge" class="badge badge-success">
+          <span class="status-dot"></span> <span id="provider-label">Connecting...</span>
+        </div>
+        <a href="/docs" target="_blank" class="btn btn-outline" id="docs-link">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          API Docs
+        </a>
+      </div>
+    </header>
+
+    <!-- Top KPI Grid -->
+    <section class="kpi-grid" id="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Total Tickets</span>
+          <span class="kpi-icon icon-blue">📊</span>
+        </div>
+        <div class="kpi-value" id="kpi-total">--</div>
+        <div class="kpi-sub">Dataset Jan - Mar 2024</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Unresolved Tickets</span>
+          <span class="kpi-icon icon-amber">⏳</span>
+        </div>
+        <div class="kpi-value text-amber" id="kpi-unresolved">--</div>
+        <div class="kpi-sub" id="kpi-unresolved-sub">Open + Escalated</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Avg Resolution Time</span>
+          <span class="kpi-icon icon-purple">⚡</span>
+        </div>
+        <div class="kpi-value" id="kpi-res-time">-- hrs</div>
+        <div class="kpi-sub">Resolved tickets</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Avg Customer Rating</span>
+          <span class="kpi-icon icon-emerald">⭐</span>
+        </div>
+        <div class="kpi-value text-emerald" id="kpi-rating">-- / 5</div>
+        <div class="kpi-sub">Satisfaction metric</div>
+      </div>
+      <div class="kpi-card card-anomaly">
+        <div class="kpi-header">
+          <span class="kpi-title">Flagged Anomalies</span>
+          <span class="kpi-icon icon-rose">🚨</span>
+        </div>
+        <div class="kpi-value text-rose" id="kpi-anomalies">--</div>
+        <div class="kpi-sub" id="kpi-anomalies-sub">SLA + Outlier + ML</div>
+      </div>
+    </section>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="tab-query" id="tab-btn-query">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Natural Language Query
+      </button>
+      <button class="tab-btn" data-tab="tab-anomalies" id="tab-btn-anomalies">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Anomaly Detector Radar
+      </button>
+      <button class="tab-btn" data-tab="tab-tickets" id="tab-btn-tickets">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        Ticket Explorer
+      </button>
+    </nav>
+
+    <!-- TAB 1: NATURAL LANGUAGE QUERY -->
+    <main id="tab-query" class="tab-content active">
+      <section class="query-section card">
+        <div class="section-title-wrap">
+          <h2>Ask Natural Language Questions</h2>
+          <p class="section-desc">Translates free-text questions into optimized SQLite queries, executes safely in read-only sandbox, and synthesizes executive answers.</p>
+        </div>
+
+        <!-- Sample Query Chips -->
+        <div class="query-chips">
+          <span class="chips-label">Sample Questions:</span>
+          <button class="chip" data-q="How many tickets are currently open?">How many tickets are open?</button>
+          <button class="chip" data-q="Which agent resolved the most tickets this month?">Top agent this month?</button>
+          <button class="chip" data-q="Show me all Critical tickets not resolved within 12 hours.">Critical tickets > 12h resolution</button>
+          <button class="chip" data-q="What is the average customer rating for Technical category tickets?">Avg rating for Technical tickets</button>
+          <button class="chip" data-q="Are there any anomalies in resolution times this week?">Anomalies in resolution times?</button>
+          <button class="chip" data-q="How many critical tickets are unresolved?">Unresolved critical tickets</button>
+          <button class="chip" data-q="Which agent has the lowest average customer rating?">Agent with lowest rating</button>
+        </div>
+
+        <!-- Search Input Bar -->
+        <form id="query-form" class="query-form">
+          <div class="input-wrapper">
+            <svg class="search-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="query-input" placeholder="e.g. How many critical tickets are unresolved?" required autocomplete="off" />
+            <button type="submit" class="btn btn-primary" id="btn-submit-query">
+              <span>Execute Query</span>
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+        </form>
+
+        <!-- Loading State -->
+        <div id="query-loading" class="loading-state hidden">
+          <div class="spinner"></div>
+          <p>Translating query with LLM and querying database...</p>
+        </div>
+
+        <!-- Query Results Container -->
+        <div id="query-result-card" class="result-card hidden">
+          <div class="result-header">
+            <div class="result-title-group">
+              <span class="badge badge-indigo" id="res-badge-provider">LLM: Gemini</span>
+              <span class="badge badge-gray" id="res-badge-time">⚡ 120 ms</span>
+              <span class="badge badge-emerald" id="res-badge-rows">1 record</span>
+            </div>
+          </div>
+
+          <!-- Synthesized Answer -->
+          <div class="answer-box">
+            <div class="answer-label">Executive AI Summary:</div>
+            <div id="res-answer" class="answer-text"></div>
+          </div>
+
+          <!-- SQL Inspector Accordion -->
+          <div class="sql-inspector">
+            <div class="sql-header" id="sql-toggle">
+              <div class="sql-title">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                <span>Generated SQLite Query</span>
+              </div>
+              <button class="btn-copy" id="btn-copy-sql" title="Copy SQL">Copy</button>
+            </div>
+            <pre class="sql-code"><code id="res-sql">SELECT ...</code></pre>
+          </div>
+
+          <!-- Data Preview Table -->
+          <div class="table-wrap" id="res-table-wrap">
+            <div class="table-header-title">Retrieved Dataset Records</div>
+            <div class="table-responsive">
+              <table id="res-table" class="data-table">
+                <thead></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- TAB 2: ANOMALY DETECTOR -->
+    <section id="tab-anomalies" class="tab-content">
+      <div class="card">
+        <div class="section-title-wrap">
+          <h2>Support Ticket Anomaly Radar</h2>
+          <p class="section-desc">Multi-layered anomaly detection combining SLA rules (e.g. unresolved critical tickets > 24h), statistical IQR/Z-score outliers, and Scikit-Learn Isolation Forest machine learning.</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="anomaly-controls">
+          <div class="filter-group">
+            <button class="filter-chip active" data-sev="ALL">All Severities</button>
+            <button class="filter-chip chip-critical" data-sev="CRITICAL">Critical</button>
+            <button class="filter-chip chip-high" data-sev="HIGH">High</button>
+            <button class="filter-chip chip-medium" data-sev="MEDIUM">Medium</button>
+          </div>
+          <div class="anomaly-count-badge" id="anomaly-filter-count">Showing -- anomalies</div>
+        </div>
+
+        <!-- Anomaly Cards Grid -->
+        <div id="anomaly-list" class="anomaly-grid">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: TICKET EXPLORER -->
+    <section id="tab-tickets" class="tab-content">
+      <div class="card">
+        <div class="section-title-wrap">
+          <h2>Complete Ticket Explorer</h2>
+          <p class="section-desc">Search, filter, and inspect the underlying 500 support tickets across categories, priorities, and agents.</p>
+        </div>
+
+        <div class="ticket-filters">
+          <select id="filter-category" class="select-box">
+            <option value="">All Categories</option>
+            <option value="Billing">Billing</option>
+            <option value="Technical">Technical</option>
+            <option value="General">General</option>
+          </select>
+          <select id="filter-priority" class="select-box">
+            <option value="">All Priorities</option>
+            <option value="Critical">Critical</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+          <select id="filter-status" class="select-box">
+            <option value="">All Statuses</option>
+            <option value="Open">Open</option>
+            <option value="Escalated">Escalated</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+          <button class="btn btn-outline" id="btn-refresh-tickets">Refresh Table</button>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-responsive">
+            <table id="tickets-table" class="data-table">
+              <thead>
+                <tr>
+                  <th>Ticket ID</th>
+                  <th>Created At</th>
+                  <th>Category</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Response (hrs)</th>
+                  <th>Resolution (hrs)</th>
+                  <th>Agent</th>
+                  <th>Rating</th>
+                  <th>Issue Summary</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div>DOTMappers IT Pvt. Ltd. — AI Engineer Assessment Sprint</div>
+      <div class="footer-meta">Zero-Cost Free Tier Architecture | Fast, Resilient & Fully Auditable</div>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

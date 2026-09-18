@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  ticketpulse-api:
+    build: .
+    container_name: ticketpulse-ai
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - OLLAMA_HOST=http://host.docker.internal:11434
+    restart: unless-stopped
