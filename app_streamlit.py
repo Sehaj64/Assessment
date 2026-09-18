@@ -30,17 +30,28 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Initialize Core Services (cached)
-@st.cache_resource
-def get_services():
-    db = DatabaseManager.get_instance()
-    detector = AnomalyDetector(db)
-    engine = QueryEngine(db)
-    return db, detector, engine
+import os
+from services.llm_client import DEFAULT_GEMINI_KEY, LLMClient
 
-db, detector, engine = get_services()
+# Initialize Database (cached)
+@st.cache_resource
+def get_db():
+    return DatabaseManager.get_instance()
+
+db = get_db()
+detector = AnomalyDetector(db)
 stats = db.get_summary_stats()
-provider_info = engine.llm.get_provider_info()
+
+# Resolve Active Gemini Key
+active_key = os.environ.get("GEMINI_API_KEY", "").strip()
+try:
+    if not active_key and "GEMINI_API_KEY" in st.secrets:
+        active_key = str(st.secrets["GEMINI_API_KEY"]).strip()
+except Exception:
+    pass
+
+if not active_key:
+    active_key = DEFAULT_GEMINI_KEY
 
 # Sidebar Settings & Diagnostics
 st.sidebar.title("⚙️ System Control")
@@ -53,10 +64,13 @@ st.sidebar.success("⚡ **Live Gemini AI Active**\n\nNatural language understand
 
 with st.sidebar.expander("🔑 Override API Key (Optional)"):
     custom_key = st.text_input("Custom Gemini Key", type="password", placeholder="Paste alternate key")
-    if custom_key and custom_key != engine.llm.gemini_key:
-        from services.llm_client import LLMClient
-        engine.llm = LLMClient(override_gemini_key=custom_key)
+    if custom_key:
+        active_key = custom_key.strip()
         st.success("Custom Gemini Key Activated!")
+
+# Fresh query engine with guaranteed Gemini connection
+llm = LLMClient(override_gemini_key=active_key)
+engine = QueryEngine(db, llm_client=llm)
 
 st.sidebar.divider()
 st.sidebar.markdown("### 🔗 Quick Links")
